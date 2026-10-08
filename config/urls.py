@@ -5,8 +5,8 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path("api/", include("rest_framework.urls")),
     path('users/', include('users.urls')),
+    path('api/materials/', include('materials.urls')),
 ]
 
 if settings.DEBUG:
