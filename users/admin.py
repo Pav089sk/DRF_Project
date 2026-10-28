@@ -1,7 +1,14 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from users.models import CustomUser
+from users.models import CustomUser, Payment
 
+
+@admin.register(Payment)
+class PaymentAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user', 'pay_date', 'summ_pay', 'payment_method', 'paid_course', 'paid_lesson')
+    list_filter = ('payment_method', 'pay_date')
+    search_fields = ('user__email',)
+    readonly_fields = ('pay_date',)
 
 @admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin):
