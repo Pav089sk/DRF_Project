@@ -4,10 +4,11 @@ from users.models import Payment
 from rest_framework import viewsets
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter
-from rest_framework.generics import CreateAPIView
+from rest_framework.generics import CreateAPIView, ListAPIView
 from users.serializers import RegisterUserSerializer
 from rest_framework.generics import RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import AllowAny
+from users.permissions import IsModerator
 
 User = get_user_model()
 
@@ -32,4 +33,7 @@ class PaymentViewSet(viewsets.ModelViewSet):
     ordering_fields = ['pay_date']
     ordering = ['-pay_date']
 
-
+class UserListView(ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [IsModerator]
