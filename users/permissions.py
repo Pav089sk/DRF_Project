@@ -9,3 +9,10 @@ class IsModerator(permissions.BasePermission):
         if not request.user.is_authenticated:
             return False
         return request.user.groups.filter(name='moderators').exists()
+
+class IsOwner(permissions.BasePermission):
+    """
+       Разрешение только владельцу объекта.
+    """
+    def has_object_permission(self, request, view, obj):
+        return obj.owner == request.user
