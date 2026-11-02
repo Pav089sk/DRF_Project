@@ -4,9 +4,10 @@ from materials.models import Course, Lesson
 
 
 class LessonSerializer(serializers.ModelSerializer):
+    course = serializers.PrimaryKeyRelatedField(queryset=Course.objects.all())
     class Meta:
         model = Lesson
-        fields = ['id', 'name', 'preview', 'description', 'video_link']
+        fields = ['id', 'name', 'preview', 'description', 'video_link', 'course']
 
 
 class CourseSerializer(serializers.ModelSerializer):

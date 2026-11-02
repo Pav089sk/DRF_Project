@@ -1,0 +1,45 @@
+[
+{
+  "model": "auth.group",
+  "fields": {
+    "name": "moderators",
+    "permissions": []
+  }
+},
+{
+  "model": "users.customuser",
+  "fields": {
+    "password": "pbkdf2_sha256$1500000$pF33LPiNbS3zfhrppQ4JBp$rp48SDNiqKH1WGCe+Qb2cpBr3QJlv7rdQgEZII7oncY=",
+    "last_login": null,
+    "is_superuser": false,
+    "email": "stest@example.com",
+    "tel": "+79001112233",
+    "city": "Moscow",
+    "avatar": "",
+    "is_active": true,
+    "is_staff": false,
+    "groups": [
+      1
+    ],
+    "user_permissions": []
+  }
+},
+{
+  "model": "users.customuser",
+  "fields": {
+    "password": "pbkdf2_sha256$1500000$gAWcbjzjFZJq0l28dObvIZ$/51ij9fBUVC5x62jc44Cpm5F6RlFl9n9aIDLnD6dkUg=",
+    "last_login": null,
+    "is_superuser": false,
+    "email": "moder@moder2.com",
+    "tel": null,
+    "city": "MSK",
+    "avatar": "",
+    "is_active": true,
+    "is_staff": false,
+    "groups": [
+      1
+    ],
+    "user_permissions": []
+  }
+}
+]

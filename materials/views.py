@@ -1,7 +1,9 @@
 from materials.serializers import CourseSerializer, LessonSerializer
-from rest_framework import viewsets, generics, permissions
+from rest_framework import viewsets, generics
 from materials.models import Course, Lesson
 from users.permissions import IsModerator, IsOwner
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.exceptions import PermissionDenied
 
 
 class CourseViewSet(viewsets.ModelViewSet):
@@ -9,21 +11,21 @@ class CourseViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.action == 'list':
-            return [permissions.IsAuthenticated()]
+            permission_classes = [IsAuthenticated]
 
         elif self.action =='retrieve':
-            return [IsModerator | IsOwner]
+            permission_classes = [IsModerator | IsOwner]
 
         elif self.action == 'create':
-            return [permissions.IsAuthenticated()]
+            permission_classes = [~IsModerator & IsAuthenticated]
 
         elif self.action in ['update', 'partial_update']:
-            return [IsModerator | IsOwner]
+            permission_classes = [IsModerator | IsOwner]
 
         elif self.action == 'destroy':
-            return [IsOwner]
+            permission_classes = [IsOwner & ~IsModerator ]
 
-        return [permissions.IsAuthenticated()]
+        return [permission() for permission in permission_classes]
 
     def get_queryset(self):
         queryset = Course.objects.all()
@@ -40,14 +42,14 @@ class CourseViewSet(viewsets.ModelViewSet):
 
 class LessonCreateApiView(generics.CreateAPIView):
     serializer_class = LessonSerializer
-    permission_classes = [permissions.IsAuthenticated()]
+    permission_classes = [IsAuthenticated & ~IsModerator]
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
 class LessonListApiView(generics.ListAPIView):
     serializer_class = LessonSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         queryset = Lesson.objects.all()
@@ -73,6 +75,13 @@ class LessonUpdateApiView(generics.UpdateAPIView):
 
 class LessonDestroyApiView(generics.DestroyAPIView):
     queryset = Lesson.objects.all()
-    permission_classes = [permissions.IsAdminUser | IsOwner]
+    permission_classes = [IsOwner]  # Пускаем только владельцев
+
+    def perform_destroy(self, instance):
+        user = self.request.user
+        if user.groups.filter(name='moderators').exists():
+            raise PermissionDenied("Модераторы не могут удалять уроки.")
+        instance.delete()
+
 
 
