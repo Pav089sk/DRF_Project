@@ -1,12 +1,15 @@
 from rest_framework import serializers
 from materials.models import Course, Lesson
+from materials.validators import UrlValidator
 
 
 
 class LessonSerializer(serializers.ModelSerializer):
     course = serializers.PrimaryKeyRelatedField(queryset=Course.objects.all())
+
     class Meta:
         model = Lesson
+        validators = [UrlValidator(field='video_link')]
         fields = ['id', 'name', 'preview', 'description', 'video_link', 'course']
 
 
