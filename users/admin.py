@@ -12,7 +12,7 @@ class PaymentAdmin(admin.ModelAdmin):
 
 @admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin):
-    filter_horizontal = ()
+    filter_horizontal = ('groups',)
     ordering = ('email',)
     list_display = ('email', 'city', 'is_staff', 'is_active')
     search_fields = ('email',)
@@ -20,7 +20,7 @@ class CustomUserAdmin(UserAdmin):
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
         ('Личные данные', {'fields': ('tel', 'city', 'avatar')}),
-        ('Права доступа', {'fields': ('is_active', 'is_staff', 'is_superuser')}),
+        ('Права доступа', {'fields': ('is_active', 'groups', 'is_staff', 'is_superuser')}),
     )
     add_fieldsets = (
         (None, {
