@@ -7,10 +7,12 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
+from materials.paginators import ListPaginator
 
 
 class CourseViewSet(viewsets.ModelViewSet):
     serializer_class = CourseSerializer
+    pagination_class = ListPaginator
 
     def get_permissions(self):
         if self.action == 'list':
@@ -53,6 +55,7 @@ class LessonCreateApiView(generics.CreateAPIView):
 class LessonListApiView(generics.ListAPIView):
     serializer_class = LessonSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = ListPaginator
 
     def get_queryset(self):
         queryset = Lesson.objects.all()
