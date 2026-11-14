@@ -47,9 +47,10 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 class Payment(models.Model):
     CASH = 'cash'
     TRANSFER = 'transfer_bank_account'
+    ONLINE = 'online_paid'
 
     PAYMENT_METHOD_CHOICES =[(CASH, 'Оплата наличными'),
-    (TRANSFER, 'Перевод на банковский счет'),]
+    (TRANSFER, 'Перевод на банковский счет'), (ONLINE, "Оплата онлайн по ссылке"),]
 
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='payments', verbose_name='Пользователь')
     pay_date = models.DateField(verbose_name='Дата оплаты')
@@ -58,6 +59,9 @@ class Payment(models.Model):
                                     verbose_name='Оплаченный курс', null=True, blank=True)
     summ_pay = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'), verbose_name='Сумма оплаты')
     payment_method = models.CharField(choices=PAYMENT_METHOD_CHOICES, max_length=30, verbose_name='Способ оплаты')
+    url_session = models.URLField(verbose_name='Ссылка на оплату курса', null=True, blank=True)
+    stripe_session_id = models.CharField(verbose_name='id сессии в stripe', max_length=400, null=True, blank=True)
+
 
     def __str__(self):
         return f"Платёж #{self.id} от {self.user.email} на сумму {self.summ_pay}"
