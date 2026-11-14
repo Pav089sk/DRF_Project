@@ -59,7 +59,7 @@ class Payment(models.Model):
                                     verbose_name='Оплаченный курс', null=True, blank=True)
     summ_pay = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'), verbose_name='Сумма оплаты')
     payment_method = models.CharField(choices=PAYMENT_METHOD_CHOICES, max_length=30, verbose_name='Способ оплаты')
-    url_session = models.URLField(verbose_name='Ссылка на оплату курса', null=True, blank=True)
+    url_session = models.URLField(max_length=500, verbose_name='Ссылка на оплату курса', null=True, blank=True)
     stripe_session_id = models.CharField(verbose_name='id сессии в stripe', max_length=400, null=True, blank=True)
 
 

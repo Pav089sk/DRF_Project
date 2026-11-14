@@ -14,6 +14,10 @@ from materials.models import Course
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from django.utils import timezone
+import stripe
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 User = get_user_model()
 
@@ -39,6 +43,20 @@ class PaymentViewSet(viewsets.ModelViewSet):
     ordering = ['-pay_date']
 
     @action(detail=False, methods=['post'])
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=['course'],
+            properties={
+                'course': openapi.Schema(
+                    type=openapi.TYPE_INTEGER,
+                    description='ID курса для покупки',
+                ),
+            },
+        ),
+        responses={201: 'Ссылка на оплату', 400: 'Ошибка'},
+    )
+
     def buy(self, request):
         course_id = request.data.get('course')
         course = get_object_or_404(Course, id=course_id)
@@ -47,11 +65,16 @@ class PaymentViewSet(viewsets.ModelViewSet):
             paid_course=course,
             summ_pay=course.price,
             payment_method=Payment.ONLINE,
+            pay_date=timezone.now()
         )
 
-        product = create_stripe_product(course)
-        price = create_stripe_price(product, course.price)
-        session_id, session_url = create_stripe_checkout_session(price)
+        try:
+            product = create_stripe_product(course)
+            price = create_stripe_price(product, course.price)
+            session_id, session_url = create_stripe_checkout_session(price)
+        except stripe.error.StripeError as e:
+            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
         payment.stripe_session_id = session_id
         payment.url_session = session_url
         payment.save()
