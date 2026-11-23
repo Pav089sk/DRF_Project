@@ -1,5 +1,5 @@
 from materials.serializers import CourseSerializer, LessonSerializer
-from rest_framework import viewsets, generics
+from rest_framework import viewsets, generics, status
 from materials.models import Course, Lesson, Subscription
 from users.permissions import IsModerator, IsOwner
 from rest_framework.permissions import IsAuthenticated
@@ -8,6 +8,7 @@ from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from materials.paginators import ListPaginator
+from materials.tasks import send_course_update_email
 
 
 class CourseViewSet(viewsets.ModelViewSet):
@@ -43,6 +44,10 @@ class CourseViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
+
+    def perform_update(self, serializer):
+        serializer.save()
+        send_course_update_email.delay(serializer.instance.pk)
 
 
 class LessonCreateApiView(generics.CreateAPIView):
